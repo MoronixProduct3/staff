@@ -1,0 +1,21 @@
+{
+  "name": "staff",
+  "version": "1.0.0",
+  "description": "An IoT costume web service",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/MoronixProduct3/staff",
+    "directory": "web_service"
+  },
+  "author": "MoronixProduct3",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "yargs": "^14.2.0"
+  }
+}
