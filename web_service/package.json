@@ -22,13 +22,14 @@
   "dependencies": {
     "a-color-picker": "^1.2.1",
     "axios": "^0.19.0",
-    "body-parser": "^1.19.0",
     "css-loader": "^3.2.0",
     "express": "^4.17.1",
+    "express-validator": "^6.2.0",
     "express-ws": "^4.0.0",
     "html-webpack-plugin": "^3.2.0",
     "material-icons": "^0.3.1",
     "materialize-css": "^1.0.0",
+    "rgb-hex": "^3.0.0",
     "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "yargs": "^14.2.0"

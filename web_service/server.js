@@ -1,7 +1,7 @@
 const webpack = require('webpack')
-const bodyParser = require('body-parser')
 const express = require('express')
 const ws = require('express-ws')
+const { param, validationResult } = require('express-validator')
 const argv = require('yargs')
     // Options
     .alias('p', 'port')
@@ -15,6 +15,16 @@ if (argv.ressource[0] !== '/')
     argv.ressource = '/' + argv.ressource
 
 
+// Send data to all devices
+function SendCommand(command, server)
+{
+    server.getWss().clients.forEach(client => {
+        if (client.readyState === 1)
+            client.send(command)
+    })
+}
+
+
 function StartServer() {
 
     // Express http server
@@ -22,18 +32,47 @@ function StartServer() {
 
 
     // WebSocket server to communicate with Staff device
-    const staffSocket = ws(app)
+    const socketServer = ws(app)
+    app.ws(argv.ressource, (socket, req) => {
+        console.log('Client socket open')
+    })
 
 
     // Routing ressources
     app.use(argv.ressource, express.static('dist'))
 
 
-    // Usr commands
-    app.post(argv.ressource, bodyParser.json(), (req, res)=> {
-        console.log(req.body)
-        res.send()
-    })
+    // Color Change request
+    app.post(
+        argv.ressource+'color/:color',
+        param('color').isHexColor(),
+        (req, res) => {
+            if (!validationResult(req).isEmpty())
+                return res.status(400).send()
+
+            console.log(`New color request: #${req.params.color}`)
+
+            // Sending color to staff
+            SendCommand('#'+req.params.color, socketServer)
+
+            res.send()
+        })
+
+    // Action request
+    app.post(
+        argv.ressource+'action/:action',
+        param('action').isInt({min:1,max:5}),
+        (req, res) => {
+            if (!validationResult(req).isEmpty())
+                return res.status(400).send()
+
+            console.log(`New action request: ${req.params.action}`)
+
+            // Sending action to staff
+            SendCommand(req.params.action, socketServer)
+
+            res.send()
+        })
 
 
     // Attaching to port
@@ -46,6 +85,7 @@ function StartServer() {
 webpack(require('./webpack.config'), (err, stats) => {
     if (err || stats.hasErrors()) {
         console.error('Failed to build web page')
+        process.exit(1)
     }
 
     StartServer()
